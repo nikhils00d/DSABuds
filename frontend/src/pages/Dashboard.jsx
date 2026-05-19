@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Users, Hash, TrendingUp, AlertCircle, ArrowRight } from 'lucide-react'
+import { Plus, Users, Hash, TrendingUp, AlertCircle, ArrowRight, Trophy } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
@@ -41,7 +41,7 @@ export default function Dashboard() {
           </div>
           <div className="text-4xl font-extrabold text-brand-500">{userStats.streak} <span className="text-xl font-medium text-[var(--text-secondary)]">days</span></div>
         </motion.div>
-        
+
         <motion.div whileHover={{ y: -3 }} className="glass-card p-6">
           <div className="flex items-center gap-4 mb-2">
             <div className="p-3 bg-blue-500/10 rounded-xl"><Trophy className="w-6 h-6 text-blue-500" /></div>
