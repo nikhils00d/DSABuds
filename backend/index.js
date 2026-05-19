@@ -17,6 +17,7 @@ app.get('/api/health', (req, res) => {
 
 // Mount Routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/groups', require('./routes/groups'));
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dsabuds')
