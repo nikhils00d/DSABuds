@@ -22,7 +22,10 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold mb-2">Welcome back, Nikhil! 👋</h1>
           <p className="text-[var(--text-secondary)]">Keep your streak alive. You're doing great!</p>
         </div>
-        <div className="mt-4 md:mt-0 flex gap-3">
+        <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 glass-card hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium border-orange-500/30 text-orange-500">
+            Link LeetCode
+          </button>
           <button onClick={() => setShowJoinModal(true)} className="flex items-center gap-2 px-4 py-2 glass-card hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
             <Hash className="w-4 h-4" /> Join Group
           </button>

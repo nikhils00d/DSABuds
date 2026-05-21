@@ -18,6 +18,8 @@ app.get('/api/health', (req, res) => {
 // Mount Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/groups', require('./routes/groups'));
+app.use('/api/leetcode', require('./routes/leetcode'));
+app.use('/api/cron', require('./routes/cron'));
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dsabuds')
