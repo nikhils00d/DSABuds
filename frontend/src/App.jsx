@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react'
-import { Sun, Moon, Target } from 'lucide-react'
+import { useState, useEffect, useContext } from 'react'
+import { Sun, Moon, Target, UserCircle, LogOut } from 'lucide-react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import GroupView from './pages/GroupView'
+import Profile from './pages/Profile'
+import AuthModal from './components/AuthModal'
+import { AuthContext } from './context/AuthContext'
 
 function App() {
   const [darkMode, setDarkMode] = useState(true)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const { user, logout } = useContext(AuthContext)
 
   useEffect(() => {
     if (darkMode) {
@@ -38,9 +43,27 @@ function App() {
                 <Link to="/dashboard" className="px-4 py-2 text-sm font-medium hover:text-brand-500 transition-colors">
                   Dashboard
                 </Link>
-                <button className="px-4 py-2 text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white rounded-lg transition-colors shadow-lg shadow-brand-500/30">
-                  Sign Up
-                </button>
+                {user ? (
+                  <>
+                    <Link to="/profile" className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Profile">
+                      <UserCircle className="w-6 h-6 text-brand-500" />
+                    </Link>
+                    <button 
+                      onClick={logout}
+                      className="px-4 py-2 flex items-center gap-2 text-sm font-medium bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="px-4 py-2 text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white rounded-lg transition-colors shadow-lg shadow-brand-500/30"
+                  >
+                    Sign In
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -51,7 +74,13 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/groups/:id" element={<GroupView />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
+
+        <AuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={() => setIsAuthModalOpen(false)} 
+        />
       </div>
     </BrowserRouter>
   )
