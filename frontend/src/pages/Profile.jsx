@@ -1,42 +1,108 @@
-import React, { useState } from 'react';
-import { User, Activity, AlertTriangle, Link as LinkIcon, Edit2, Code, Briefcase, Calendar, Trophy, Flame } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { User, Activity, AlertTriangle, Link as LinkIcon, Edit2, Code, Briefcase, Calendar, Trophy, Flame, Loader2 } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 const Profile = () => {
-  // Mock user data for now
-  const [user, setUser] = useState({
-    name: 'Nikhil Sood',
-    username: '@nikhils00d',
+  const { user: authUser } = useContext(AuthContext);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [recentActivity, setRecentActivity] = useState([]);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const token = localStorage.getItem('dsabuds_token');
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        // 1. Fetch user profile from DB
+        const res = await fetch('http://localhost:5000/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setUserData(data);
+
+          // 2. Fetch LeetCode sync data
+          if (data.leetcodeUsername) {
+            const lcRes = await fetch('http://localhost:5000/api/leetcode/sync', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const lcData = await lcRes.json();
+            
+            if (lcRes.ok && lcData.recentSubmissions) {
+              const activities = lcData.recentSubmissions.map((sub, index) => ({
+                id: sub.id || index,
+                type: 'solve',
+                text: `Solved "${sub.title}"`,
+                date: new Date(sub.timestamp * 1000).toLocaleString(),
+                points: '+1'
+              }));
+              setRecentActivity(activities.slice(0, 5));
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
+        <Loader2 className="w-10 h-10 text-brand-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center pt-24 bg-[var(--bg-primary)] text-center px-4">
+        <h2 className="text-3xl font-bold mb-4">Please sign in to view your profile</h2>
+        <p className="text-[var(--text-secondary)]">Create an account to start tracking your LeetCode streaks!</p>
+      </div>
+    );
+  }
+
+  const displayUser = {
+    name: userData.username,
+    username: `@${userData.username}`,
     bio: 'DSA Enthusiast | Full Stack Developer',
-    leetcodeUsername: 'yuy3JV3iNB',
-    github: 'nikhils00d',
-    linkedin: 'nikhils00d',
+    leetcodeUsername: userData.leetcodeUsername || 'Not linked',
+    github: 'Not linked',
+    linkedin: 'Not linked',
     stats: {
-      currentStreak: 12,
-      longestStreak: 45,
-      totalFinesPaid: 440,
-      problemsSolved: 342,
-    },
-    recentActivity: [
-      { id: 1, type: 'solve', text: 'Solved 2 problems on LeetCode', date: 'Today, 10:30 AM', points: '+10' },
-      { id: 2, type: 'fine', text: 'Missed daily streak - Fine applied', date: 'Yesterday', amount: '₹110' },
-      { id: 3, type: 'solve', text: 'Solved "Two Sum"', date: 'May 29', points: '+5' },
-    ]
-  });
+      currentStreak: userData.streak || 0,
+      longestStreak: userData.streak || 0,
+      totalFinesPaid: userData.totalFine || 0,
+      problemsSolved: recentActivity.length > 0 ? recentActivity.length + '+' : 0,
+    }
+  };
 
   return (
     <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
-
+      
       {/* Header Section */}
       <div className="glass-card p-8 mb-8 relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-brand-500/10 blur-3xl"></div>
-
+        
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
           {/* Avatar */}
           <div className="relative group">
             <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-brand-400 to-indigo-500 p-1">
               <div className="w-full h-full rounded-full bg-[var(--bg-primary)] flex items-center justify-center overflow-hidden">
-                <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-indigo-600">NS</span>
+                <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-indigo-600">
+                  {displayUser.name.substring(0, 2).toUpperCase()}
+                </span>
               </div>
             </div>
             <button className="absolute bottom-0 right-0 p-2 bg-brand-500 text-white rounded-full hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30">
@@ -46,21 +112,21 @@ const Profile = () => {
 
           {/* User Info */}
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl font-bold mb-1">{user.name}</h1>
-            <p className="text-[var(--text-secondary)] font-medium mb-4">{user.username}</p>
-            <p className="text-sm max-w-md mx-auto md:mx-0 mb-6">{user.bio}</p>
-
+            <h1 className="text-3xl font-bold mb-1">{displayUser.name}</h1>
+            <p className="text-[var(--text-secondary)] font-medium mb-4">{displayUser.username}</p>
+            <p className="text-sm max-w-md mx-auto md:mx-0 mb-6">{displayUser.bio}</p>
+            
             {/* Social Links */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-              <a href={`https://leetcode.com/${user.leetcodeUsername}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 text-orange-600 hover:bg-orange-500/20 transition-colors">
+              <a href={displayUser.leetcodeUsername !== 'Not linked' ? `https://leetcode.com/${displayUser.leetcodeUsername}` : '#'} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 text-orange-600 hover:bg-orange-500/20 transition-colors">
                 <Activity className="w-4 h-4" />
-                <span className="text-sm font-medium">{user.leetcodeUsername}</span>
+                <span className="text-sm font-medium">{displayUser.leetcodeUsername}</span>
               </a>
-              <a href={`https://github.com/${user.github}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-300 hover:bg-slate-500/20 transition-colors">
+              <a href="#" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-300 hover:bg-slate-500/20 transition-colors">
                 <Code className="w-4 h-4" />
                 <span className="text-sm font-medium">GitHub</span>
               </a>
-              <a href={`https://linkedin.com/in/${user.linkedin}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors">
+              <a href="#" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors">
                 <Briefcase className="w-4 h-4" />
                 <span className="text-sm font-medium">LinkedIn</span>
               </a>
@@ -70,7 +136,7 @@ const Profile = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
+        
         {/* Left Column - Stats */}
         <div className="lg:col-span-2 space-y-8">
           {/* Stats Grid */}
@@ -79,28 +145,28 @@ const Profile = () => {
               <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mb-3 text-orange-500">
                 <Flame className="w-6 h-6" />
               </div>
-              <p className="text-2xl font-bold">{user.stats.currentStreak}</p>
+              <p className="text-2xl font-bold">{displayUser.stats.currentStreak}</p>
               <p className="text-xs text-[var(--text-secondary)] font-medium uppercase tracking-wider mt-1">Current Streak</p>
             </div>
             <div className="glass-card p-6 flex flex-col items-center justify-center text-center">
               <div className="w-12 h-12 rounded-full bg-brand-500/10 flex items-center justify-center mb-3 text-brand-500">
                 <Trophy className="w-6 h-6" />
               </div>
-              <p className="text-2xl font-bold">{user.stats.longestStreak}</p>
+              <p className="text-2xl font-bold">{displayUser.stats.longestStreak}</p>
               <p className="text-xs text-[var(--text-secondary)] font-medium uppercase tracking-wider mt-1">Best Streak</p>
             </div>
             <div className="glass-card p-6 flex flex-col items-center justify-center text-center">
               <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-3 text-red-500">
                 <AlertTriangle className="w-6 h-6" />
               </div>
-              <p className="text-2xl font-bold text-red-500">₹{user.stats.totalFinesPaid}</p>
+              <p className="text-2xl font-bold text-red-500">₹{displayUser.stats.totalFinesPaid}</p>
               <p className="text-xs text-[var(--text-secondary)] font-medium uppercase tracking-wider mt-1">Fines Paid</p>
             </div>
             <div className="glass-card p-6 flex flex-col items-center justify-center text-center">
               <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center mb-3 text-indigo-500">
                 <Activity className="w-6 h-6" />
               </div>
-              <p className="text-2xl font-bold">{user.stats.problemsSolved}</p>
+              <p className="text-2xl font-bold">{displayUser.stats.problemsSolved}</p>
               <p className="text-xs text-[var(--text-secondary)] font-medium uppercase tracking-wider mt-1">Total Solved</p>
             </div>
           </div>
@@ -114,28 +180,39 @@ const Profile = () => {
               </h2>
               <button className="text-sm text-brand-500 hover:text-brand-600 font-medium">View All</button>
             </div>
-
+            
             <div className="space-y-6">
-              {user.recentActivity.map((activity) => (
-                <div key={activity.id} className="flex gap-4">
-                  <div className="relative flex flex-col items-center">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 z-10 ${activity.type === 'solve' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex gap-4 relative">
+                    <div className="relative flex flex-col items-center">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 z-10 ${
+                        activity.type === 'solve' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
                       }`}>
-                      {activity.type === 'solve' ? <Activity className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                        {activity.type === 'solve' ? <Activity className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                      </div>
+                      {/* Line connecting timeline items */}
+                      <div className="w-0.5 h-full bg-[var(--border-color)] absolute top-10 -bottom-6"></div>
                     </div>
-                    {/* Line connecting timeline items */}
-                    <div className="w-0.5 h-full bg-[var(--border-color)] absolute top-10 -bottom-6"></div>
-                  </div>
-                  <div className="pb-6">
-                    <p className="font-medium text-[var(--text-primary)]">{activity.text}</p>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs text-[var(--text-secondary)]">{activity.date}</span>
-                      {activity.points && <span className="text-xs font-bold text-green-500">{activity.points}</span>}
-                      {activity.amount && <span className="text-xs font-bold text-red-500">-{activity.amount}</span>}
+                    <div className="pb-6">
+                      <p className="font-medium text-[var(--text-primary)]">{activity.text}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-[var(--text-secondary)]">{activity.date}</span>
+                        {activity.points && <span className="text-xs font-bold text-green-500">{activity.points}</span>}
+                        {activity.amount && <span className="text-xs font-bold text-red-500">-{activity.amount}</span>}
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-[var(--text-secondary)]">
+                  <Activity className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                  <p>No recent activity found.</p>
+                  {displayUser.leetcodeUsername === 'Not linked' && (
+                    <p className="text-sm mt-2 text-brand-500">Link your LeetCode account to see your solves!</p>
+                  )}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

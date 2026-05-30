@@ -99,4 +99,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// @route GET /api/auth/me
+// @desc Get logged in user's profile data
+router.get('/me', require('../middleware/authMiddleware'), async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-passwordHash');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 module.exports = router;
