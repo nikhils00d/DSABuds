@@ -22,6 +22,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  githubUsername: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  linkedinUsername: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   streak: {
     type: Number,
     default: 0

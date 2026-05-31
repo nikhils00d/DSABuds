@@ -114,4 +114,27 @@ router.get('/me', require('../middleware/authMiddleware'), async (req, res) => {
   }
 });
 
+// @route PUT /api/auth/profile
+// @desc Update user profile (GitHub, LinkedIn, etc.)
+router.put('/profile', require('../middleware/authMiddleware'), async (req, res) => {
+  try {
+    const { githubUsername, linkedinUsername, leetcodeUsername } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (githubUsername !== undefined) user.githubUsername = githubUsername;
+    if (linkedinUsername !== undefined) user.linkedinUsername = linkedinUsername;
+    if (leetcodeUsername !== undefined) user.leetcodeUsername = leetcodeUsername;
+
+    await user.save();
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 module.exports = router;

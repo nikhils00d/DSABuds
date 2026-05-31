@@ -1,59 +1,101 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { User, Activity, AlertTriangle, Link as LinkIcon, Edit2, Code, Briefcase, Calendar, Trophy, Flame, Loader2 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { motion } from 'framer-motion';
 
 const Profile = () => {
   const { user: authUser } = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recentActivity, setRecentActivity] = useState([]);
+  
+  // Edit Profile State
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    leetcodeUsername: '',
+    githubUsername: '',
+    linkedinUsername: ''
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const token = localStorage.getItem('dsabuds_token');
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        // 1. Fetch user profile from DB
-        const res = await fetch('http://localhost:5000/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          setUserData(data);
-
-          // 2. Fetch LeetCode sync data
-          if (data.leetcodeUsername) {
-            const lcRes = await fetch('http://localhost:5000/api/leetcode/sync', {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const lcData = await lcRes.json();
-            
-            if (lcRes.ok && lcData.recentSubmissions) {
-              const activities = lcData.recentSubmissions.map((sub, index) => ({
-                id: sub.id || index,
-                type: 'solve',
-                text: `Solved "${sub.title}"`,
-                date: new Date(sub.timestamp * 1000).toLocaleString(),
-                points: '+1'
-              }));
-              setRecentActivity(activities.slice(0, 5));
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProfileData();
   }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      const token = localStorage.getItem('dsabuds_token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      // 1. Fetch user profile from DB
+      const res = await fetch('http://localhost:5000/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUserData(data);
+        
+        // Populate edit form with existing data
+        setEditFormData({
+          leetcodeUsername: data.leetcodeUsername || '',
+          githubUsername: data.githubUsername || '',
+          linkedinUsername: data.linkedinUsername || ''
+        });
+
+        // 2. Fetch LeetCode sync data
+        if (data.leetcodeUsername) {
+          const lcRes = await fetch('http://localhost:5000/api/leetcode/sync', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const lcData = await lcRes.json();
+          
+          if (lcRes.ok && lcData.recentSubmissions) {
+            const activities = lcData.recentSubmissions.map((sub, index) => ({
+              id: sub.id || index,
+              type: 'solve',
+              text: `Solved "${sub.title}"`,
+              date: new Date(sub.timestamp * 1000).toLocaleString(),
+              points: '+1'
+            }));
+            setRecentActivity(activities.slice(0, 5));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      setSaving(true);
+      const token = localStorage.getItem('dsabuds_token');
+      const res = await fetch('http://localhost:5000/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editFormData)
+      });
+
+      if (res.ok) {
+        // Refresh profile data to get updated links and trigger Leetcode sync if changed
+        await fetchProfileData();
+        setIsEditingProfile(false);
+      }
+    } catch (error) {
+      console.error("Failed to update profile", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -77,8 +119,8 @@ const Profile = () => {
     username: `@${userData.username}`,
     bio: 'DSA Enthusiast | Full Stack Developer',
     leetcodeUsername: userData.leetcodeUsername || 'Not linked',
-    github: 'Not linked',
-    linkedin: 'Not linked',
+    github: userData.githubUsername || 'Not linked',
+    linkedin: userData.linkedinUsername || 'Not linked',
     stats: {
       currentStreak: userData.streak || 0,
       longestStreak: userData.streak || 0,
@@ -105,7 +147,10 @@ const Profile = () => {
                 </span>
               </div>
             </div>
-            <button className="absolute bottom-0 right-0 p-2 bg-brand-500 text-white rounded-full hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30">
+            <button 
+              onClick={() => setIsEditingProfile(true)}
+              className="absolute bottom-0 right-0 p-2 bg-brand-500 text-white rounded-full hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
+            >
               <Edit2 className="w-4 h-4" />
             </button>
           </div>
@@ -122,13 +167,13 @@ const Profile = () => {
                 <Activity className="w-4 h-4" />
                 <span className="text-sm font-medium">{displayUser.leetcodeUsername}</span>
               </a>
-              <a href="#" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-300 hover:bg-slate-500/20 transition-colors">
+              <a href={displayUser.github !== 'Not linked' ? `https://github.com/${displayUser.github}` : '#'} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-300 hover:bg-slate-500/20 transition-colors">
                 <Code className="w-4 h-4" />
-                <span className="text-sm font-medium">GitHub</span>
+                <span className="text-sm font-medium">{displayUser.github === 'Not linked' ? 'GitHub' : displayUser.github}</span>
               </a>
-              <a href="#" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors">
+              <a href={displayUser.linkedin !== 'Not linked' ? `https://linkedin.com/in/${displayUser.linkedin}` : '#'} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors">
                 <Briefcase className="w-4 h-4" />
-                <span className="text-sm font-medium">LinkedIn</span>
+                <span className="text-sm font-medium">{displayUser.linkedin === 'Not linked' ? 'LinkedIn' : displayUser.linkedin}</span>
               </a>
             </div>
           </div>
@@ -232,10 +277,10 @@ const Profile = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium">LeetCode</p>
-                    <p className="text-xs text-[var(--text-secondary)]">Connected</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{displayUser.leetcodeUsername !== 'Not linked' ? displayUser.leetcodeUsername : 'Not connected'}</p>
                   </div>
                 </div>
-                <button className="text-xs font-medium text-brand-500">Manage</button>
+                <button onClick={() => setIsEditingProfile(true)} className="text-xs font-medium text-brand-500">Manage</button>
               </div>
               <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
                 <div className="flex items-center gap-3">
@@ -244,10 +289,22 @@ const Profile = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium">GitHub</p>
-                    <p className="text-xs text-[var(--text-secondary)]">Connected</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{displayUser.github !== 'Not linked' ? displayUser.github : 'Not connected'}</p>
                   </div>
                 </div>
-                <button className="text-xs font-medium text-brand-500">Manage</button>
+                <button onClick={() => setIsEditingProfile(true)} className="text-xs font-medium text-brand-500">Manage</button>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <Briefcase className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">LinkedIn</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{displayUser.linkedin !== 'Not linked' ? displayUser.linkedin : 'Not connected'}</p>
+                  </div>
+                </div>
+                <button onClick={() => setIsEditingProfile(true)} className="text-xs font-medium text-brand-500">Manage</button>
               </div>
             </div>
           </div>
@@ -262,6 +319,68 @@ const Profile = () => {
         </div>
 
       </div>
+
+      {/* Edit Profile Modal */}
+      {isEditingProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card bg-[var(--bg-primary)] p-8 max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><LinkIcon className="w-6 h-6 text-brand-500" /> Manage Connections</h2>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">LeetCode Username</label>
+                <input 
+                  type="text" 
+                  value={editFormData.leetcodeUsername}
+                  onChange={(e) => setEditFormData({...editFormData, leetcodeUsername: e.target.value})}
+                  placeholder="e.g. nikhils00d" 
+                  className="w-full px-4 py-3 bg-transparent border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-brand-500" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">GitHub Username</label>
+                <input 
+                  type="text" 
+                  value={editFormData.githubUsername}
+                  onChange={(e) => setEditFormData({...editFormData, githubUsername: e.target.value})}
+                  placeholder="e.g. nikhils00d" 
+                  className="w-full px-4 py-3 bg-transparent border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-brand-500" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">LinkedIn Username</label>
+                <input 
+                  type="text" 
+                  value={editFormData.linkedinUsername}
+                  onChange={(e) => setEditFormData({...editFormData, linkedinUsername: e.target.value})}
+                  placeholder="e.g. nikhil-sood" 
+                  className="w-full px-4 py-3 bg-transparent border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-brand-500" 
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-4 justify-end">
+              <button 
+                onClick={() => setIsEditingProfile(false)} 
+                disabled={saving}
+                className="px-4 py-2 font-medium"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleUpdateProfile}
+                disabled={saving}
+                className="px-6 py-2 bg-brand-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 flex items-center gap-2"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
     </div>
   );
 };
