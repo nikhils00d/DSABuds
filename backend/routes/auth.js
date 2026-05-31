@@ -103,7 +103,7 @@ router.post('/login', async (req, res) => {
 // @desc Get logged in user's profile data
 router.get('/me', require('../middleware/authMiddleware'), async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-passwordHash');
+    const user = await User.findById(req.user.id).select('-passwordHash').populate('joinedGroups', 'groupName groupFund members');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

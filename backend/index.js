@@ -25,6 +25,11 @@ app.use('/api/cron', require('./routes/cron'));
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dsabuds')
   .then(() => {
     console.log('Connected to MongoDB');
+    
+    // Initialize scheduled cron jobs
+    require('./services/cronService');
+    console.log('Cron jobs scheduled');
+
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
