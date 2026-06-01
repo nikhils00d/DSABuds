@@ -20,14 +20,19 @@ router.get('/sync', auth, async (req, res) => {
 
     const username = user.leetcodeUsername;
 
-    // GraphQL query to fetch recent submissions
+    // GraphQL query to fetch recent submissions and current streak
     const query = `
-      query recentAcSubmissions($username: String!, $limit: Int!) {
+      query leetcodeSync($username: String!, $limit: Int!) {
         recentAcSubmissionList(username: $username, limit: $limit) {
           id
           title
           titleSlug
           timestamp
+        }
+        matchedUser(username: $username) {
+          userCalendar {
+            streak
+          }
         }
       }
     `;
@@ -38,46 +43,66 @@ router.get('/sync', auth, async (req, res) => {
     });
 
     const submissions = response.data.data.recentAcSubmissionList;
+    const leetcodeStreak = response.data.data.matchedUser?.userCalendar?.streak || 0;
     
-    // Check if there's a submission today (local server time matching)
-    // In a real production app, timezones are tricky, we'll use simple UTC Date checking for the MVP.
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    const todaySubmissions = submissions.filter(sub => {
+    // Group all recent submissions by day (UTC)
+    const dailyData = {};
+    for (const sub of submissions) {
       const subDate = new Date(sub.timestamp * 1000);
-      return subDate >= today;
-    });
+      subDate.setUTCHours(0, 0, 0, 0);
+      const dateKey = subDate.toISOString();
+      
+      if (!dailyData[dateKey]) {
+        dailyData[dateKey] = {
+          date: subDate,
+          submissions: []
+        };
+      }
+      dailyData[dateKey].submissions.push(sub);
+    }
 
-    const solvedToday = todaySubmissions.length > 0;
-
-    // Update DailyActivity
-    let activity = await DailyActivity.findOne({ userId: user._id, date: today });
-    
-    if (!activity) {
-      activity = new DailyActivity({
-        userId: user._id,
-        date: today,
-        solvedQuestions: todaySubmissions.map(s => ({ title: s.title, titleSlug: s.titleSlug, difficulty: 'Unknown' })),
-        solvedCount: todaySubmissions.length,
-        streakMaintained: solvedToday
-      });
-    } else {
-      activity.solvedQuestions = todaySubmissions.map(s => ({ title: s.title, titleSlug: s.titleSlug, difficulty: 'Unknown' }));
-      activity.solvedCount = todaySubmissions.length;
-      activity.streakMaintained = solvedToday;
+    // Upsert DailyActivity for each day found in recent submissions
+    for (const dateKey in dailyData) {
+      const { date, submissions: daySubs } = dailyData[dateKey];
+      let activity = await DailyActivity.findOne({ userId: user._id, date: date });
+      
+      if (!activity) {
+        activity = new DailyActivity({
+          userId: user._id,
+          date: date,
+          solvedQuestions: daySubs.map(s => ({ title: s.title, titleSlug: s.titleSlug, difficulty: 'Unknown' })),
+          solvedCount: daySubs.length,
+          streakMaintained: true
+        });
+      } else {
+        activity.solvedQuestions = daySubs.map(s => ({ title: s.title, titleSlug: s.titleSlug, difficulty: 'Unknown' }));
+        activity.solvedCount = daySubs.length;
+        activity.streakMaintained = true;
+      }
+      await activity.save();
     }
     
-    await activity.save();
+    // Use the official streak from LeetCode API directly
+    if (user.streak !== leetcodeStreak) {
+      user.streak = leetcodeStreak;
+      // We don't reset fines here, fines are handled by cron.
+      await user.save();
+    }
+    
+    // Check if there's a submission today (local server time matching) for the response flag
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const solvedToday = dailyData[today.toISOString()] && dailyData[today.toISOString()].submissions.length > 0;
 
     // Note: The actual "Daily Cron Job" would run at midnight to check if `streakMaintained` is false 
     // for all users, and apply the Fine Logic (missedDays++, streak = 0, totalFine += (missedDays * 10)).
-    // For this sync endpoint, we just return the latest stats.
+    // For this sync endpoint, we dynamically calculate the correct streak.
 
     res.json({
       message: 'LeetCode data synced successfully',
       solvedToday,
-      submissionsToday: todaySubmissions.length,
+      streak: user.streak,
+      submissionsToday: dailyData[today.toISOString()] ? dailyData[today.toISOString()].submissions.length : 0,
       recentSubmissions: submissions
     });
 

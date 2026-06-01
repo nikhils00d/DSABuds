@@ -53,15 +53,20 @@ const Profile = () => {
           });
           const lcData = await lcRes.json();
           
-          if (lcRes.ok && lcData.recentSubmissions) {
-            const activities = lcData.recentSubmissions.map((sub, index) => ({
-              id: sub.id || index,
-              type: 'solve',
-              text: `Solved "${sub.title}"`,
-              date: new Date(sub.timestamp * 1000).toLocaleString(),
-              points: '+1'
-            }));
-            setRecentActivity(activities.slice(0, 5));
+          if (lcRes.ok) {
+            if (lcData.recentSubmissions) {
+              const activities = lcData.recentSubmissions.map((sub, index) => ({
+                id: sub.id || index,
+                type: 'solve',
+                text: `Solved "${sub.title}"`,
+                date: new Date(sub.timestamp * 1000).toLocaleString(),
+                points: '+1'
+              }));
+              setRecentActivity(activities.slice(0, 5));
+            }
+            if (lcData.streak !== undefined) {
+              setUserData(prev => ({ ...prev, streak: lcData.streak }));
+            }
           }
         }
       }
