@@ -7,8 +7,7 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: '',
-    leetcodeUsername: ''
+    password: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +29,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       if (isLogin) {
         await login(formData.email, formData.password);
       } else {
-        await signup(formData.username, formData.email, formData.password, formData.leetcodeUsername);
+        await signup(formData.username, formData.email, formData.password);
       }
       onClose();
     } catch (err) {
@@ -111,22 +110,6 @@ const AuthModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium mb-1">LeetCode Username (Optional)</label>
-              <div className="relative">
-                <Activity className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input 
-                  type="text" 
-                  name="leetcodeUsername"
-                  value={formData.leetcodeUsername}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-brand-500 transition-colors"
-                  placeholder="johndoe_lc"
-                />
-              </div>
-            </div>
-          )}
 
           <button 
             type="submit" 

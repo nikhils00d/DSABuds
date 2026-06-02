@@ -17,6 +17,7 @@ const Profile = () => {
     linkedinUsername: ''
   });
   const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     fetchProfileData();
@@ -80,6 +81,7 @@ const Profile = () => {
   const handleUpdateProfile = async () => {
     try {
       setSaving(true);
+      setEditError('');
       const token = localStorage.getItem('dsabuds_token');
       const res = await fetch('http://localhost:5000/api/auth/profile', {
         method: 'PUT',
@@ -94,9 +96,13 @@ const Profile = () => {
         // Refresh profile data to get updated links and trigger Leetcode sync if changed
         await fetchProfileData();
         setIsEditingProfile(false);
+      } else {
+        const data = await res.json();
+        setEditError(data.message || 'Failed to update profile');
       }
     } catch (error) {
       console.error("Failed to update profile", error);
+      setEditError('An unexpected error occurred');
     } finally {
       setSaving(false);
     }
@@ -334,6 +340,10 @@ const Profile = () => {
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">LeetCode Username</label>
+                <div className="mb-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-600 dark:text-blue-400">
+                  <p className="font-medium mb-1">Verification Required</p>
+                  <p>To link your LeetCode account, you must add <strong className="font-mono bg-blue-500/20 px-1 py-0.5 rounded text-blue-700 dark:text-blue-300">DSABUDS-{authUser?.id?.substring(0, 8).toUpperCase()}</strong> to your LeetCode profile's <strong>"About Me"</strong> section.</p>
+                </div>
                 <input 
                   type="text" 
                   value={editFormData.leetcodeUsername}
@@ -365,6 +375,13 @@ const Profile = () => {
                 />
               </div>
             </div>
+            
+            {editError && (
+              <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                {editError}
+              </div>
+            )}
             
             <div className="flex gap-4 justify-end">
               <button 

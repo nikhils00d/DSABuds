@@ -33,11 +33,11 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
-  const signup = async (username, email, password, leetcodeUsername) => {
+  const signup = async (username, email, password) => {
     const res = await fetch('http://localhost:5000/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password, leetcodeUsername })
+      body: JSON.stringify({ username, email, password })
     });
     const data = await res.json();
     

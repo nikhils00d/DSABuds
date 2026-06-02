@@ -120,9 +120,40 @@ router.post('/link', auth, async (req, res) => {
     const { leetcodeUsername } = req.body;
     if (!leetcodeUsername) return res.status(400).json({ message: 'Username is required' });
 
+    // Verify LeetCode username exists and is authorized
+    const query = `
+      query getUserProfile($username: String!) {
+        matchedUser(username: $username) {
+          username
+          profile {
+            aboutMe
+          }
+        }
+      }
+    `;
+    const response = await axios.post(LEETCODE_API, {
+      query,
+      variables: { username: leetcodeUsername }
+    });
+
+    const matchedUser = response.data.data.matchedUser;
+    if (!matchedUser) {
+      return res.status(400).json({ message: 'LeetCode profile not found' });
+    }
+
+    const aboutMe = matchedUser.profile?.aboutMe || '';
+    const verificationCode = `DSABUDS-${req.user.id.substring(0, 8).toUpperCase()}`;
+    
+    if (!aboutMe.includes(verificationCode)) {
+      return res.status(400).json({ 
+        message: `Verification failed. Please add "${verificationCode}" to your LeetCode About Me section and try again.` 
+      });
+    }
+
     const user = await User.findByIdAndUpdate(req.user.id, { leetcodeUsername }, { new: true });
     res.json({ message: 'LeetCode account linked', user: { leetcodeUsername: user.leetcodeUsername } });
   } catch (error) {
+    console.error('Error verifying LeetCode profile:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 });

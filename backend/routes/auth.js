@@ -30,7 +30,7 @@ router.post('/signup', async (req, res) => {
       username,
       email,
       passwordHash,
-      leetcodeUsername: leetcodeUsername || ''
+      leetcodeUsername: ''
     });
 
     const savedUser = await newUser.save();
@@ -127,7 +127,48 @@ router.put('/profile', require('../middleware/authMiddleware'), async (req, res)
 
     if (githubUsername !== undefined) user.githubUsername = githubUsername;
     if (linkedinUsername !== undefined) user.linkedinUsername = linkedinUsername;
-    if (leetcodeUsername !== undefined) user.leetcodeUsername = leetcodeUsername;
+    
+    // Verify LeetCode username exists and authorized before linking
+    if (leetcodeUsername !== undefined && leetcodeUsername !== '') {
+      try {
+        const axios = require('axios');
+        const query = `
+          query getUserProfile($username: String!) {
+            matchedUser(username: $username) {
+              username
+              profile {
+                aboutMe
+              }
+            }
+          }
+        `;
+        const response = await axios.post('https://leetcode.com/graphql', {
+          query,
+          variables: { username: leetcodeUsername }
+        });
+
+        const matchedUser = response.data.data.matchedUser;
+        if (!matchedUser) {
+          return res.status(400).json({ message: 'LeetCode profile not found' });
+        }
+        
+        const aboutMe = matchedUser.profile?.aboutMe || '';
+        const verificationCode = `DSABUDS-${user._id.toString().substring(0, 8).toUpperCase()}`;
+        
+        if (!aboutMe.includes(verificationCode)) {
+          return res.status(400).json({ 
+            message: `Verification failed. Please add "${verificationCode}" to your LeetCode About Me section and try again.` 
+          });
+        }
+        
+        user.leetcodeUsername = leetcodeUsername;
+      } catch (err) {
+        console.error('Error verifying LeetCode profile:', err.message);
+        return res.status(500).json({ message: 'Failed to verify LeetCode profile' });
+      }
+    } else if (leetcodeUsername === '') {
+      user.leetcodeUsername = '';
+    }
 
     await user.save();
     res.json(user);
