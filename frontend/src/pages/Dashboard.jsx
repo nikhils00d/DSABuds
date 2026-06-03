@@ -33,6 +33,23 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json()
         setUserData(data)
+        
+        // Sync LeetCode data to ensure streak is up-to-date
+        if (data.leetcodeUsername) {
+          try {
+            const lcRes = await fetch('http://localhost:5000/api/leetcode/sync', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
+            if (lcRes.ok) {
+              const lcData = await lcRes.json()
+              if (lcData.streak !== undefined) {
+                setUserData(prev => ({ ...prev, streak: lcData.streak }))
+              }
+            }
+          } catch (syncError) {
+            console.error('Failed to sync LeetCode data:', syncError)
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
