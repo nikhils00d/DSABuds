@@ -23,7 +23,7 @@ export default function GroupView() {
           return
         }
 
-        const res = await fetch(`http://localhost:5000/api/groups/${id}`, {
+        const res = await fetch(`/api/groups/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         

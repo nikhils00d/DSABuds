@@ -32,7 +32,7 @@ const Profile = () => {
       }
 
       // 1. Fetch user profile from DB
-      const res = await fetch('http://localhost:5000/api/auth/me', {
+      const res = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -49,7 +49,7 @@ const Profile = () => {
 
         // 2. Fetch LeetCode sync data
         if (data.leetcodeUsername) {
-          const lcRes = await fetch('http://localhost:5000/api/leetcode/sync', {
+          const lcRes = await fetch('/api/leetcode/sync', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const lcData = await lcRes.json();
@@ -83,7 +83,7 @@ const Profile = () => {
       setSaving(true);
       setEditError('');
       const token = localStorage.getItem('dsabuds_token');
-      const res = await fetch('http://localhost:5000/api/auth/profile', {
+      const res = await fetch('/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

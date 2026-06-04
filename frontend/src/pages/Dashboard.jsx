@@ -26,7 +26,7 @@ export default function Dashboard() {
       const token = localStorage.getItem('dsabuds_token')
       if (!token) return
 
-      const res = await fetch('http://localhost:5000/api/auth/me', {
+      const res = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       
@@ -37,7 +37,7 @@ export default function Dashboard() {
         // Sync LeetCode data to ensure streak is up-to-date
         if (data.leetcodeUsername) {
           try {
-            const lcRes = await fetch('http://localhost:5000/api/leetcode/sync', {
+            const lcRes = await fetch('/api/leetcode/sync', {
               headers: { 'Authorization': `Bearer ${token}` }
             })
             if (lcRes.ok) {
@@ -73,7 +73,7 @@ export default function Dashboard() {
       setFormError('')
       const token = localStorage.getItem('dsabuds_token')
       
-      const res = await fetch('http://localhost:5000/api/groups/create', {
+      const res = await fetch('/api/groups/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default function Dashboard() {
       setFormError('')
       const token = localStorage.getItem('dsabuds_token')
       
-      const res = await fetch('http://localhost:5000/api/groups/join', {
+      const res = await fetch('/api/groups/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

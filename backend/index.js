@@ -26,14 +26,19 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dsabuds')
   .then(() => {
     console.log('Connected to MongoDB');
     
-    // Initialize scheduled cron jobs
+    // Initialize scheduled cron jobs (Note: may not run persistently on serverless)
     require('./services/cronService');
     console.log('Cron jobs scheduled');
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
   });
+
+// Only start the server locally. Vercel will handle the routing via the exported app.
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

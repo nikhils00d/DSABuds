@@ -6,10 +6,10 @@ const DailyActivity = require('../models/DailyActivity');
 
 const { processMidnightFines } = require('../services/cronService');
 
-// @route   POST /api/cron/process-fines
+// @route   ALL /api/cron/process-fines
 // @desc    Run the midnight fine calculation logic (Simulated Cron Job)
 // @access  Public (In production, this would be restricted to internal cron services)
-router.post('/process-fines', async (req, res) => {
+router.all('/process-fines', async (req, res) => {
   try {
     // Manually trigger the midnight job
     await processMidnightFines();
