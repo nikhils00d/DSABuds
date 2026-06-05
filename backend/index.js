@@ -34,11 +34,9 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dsabuds')
     console.error('MongoDB connection error:', err);
   });
 
-// Only start the server locally. Vercel will handle the routing via the exported app.
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+// Start the server (Required for Railway)
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;

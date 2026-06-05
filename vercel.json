@@ -7,34 +7,19 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "backend/index.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/backend/index.js"
+      "dest": "https://dsabuds-production.up.railway.app/api/$1"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/frontend/dist/assets/$1"
-    },
-    {
-      "src": "/(.*\\.svg)",
-      "dest": "/frontend/dist/$1"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/dist/index.html"
-    }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron/process-fines",
-      "schedule": "59 23 * * *"
+      "dest": "/index.html"
     }
   ]
 }
