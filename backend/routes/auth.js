@@ -118,7 +118,7 @@ router.get('/me', require('../middleware/authMiddleware'), async (req, res) => {
 // @desc Update user profile (GitHub, LinkedIn, etc.)
 router.put('/profile', require('../middleware/authMiddleware'), async (req, res) => {
   try {
-    const { githubUsername, linkedinUsername, leetcodeUsername } = req.body;
+    const { githubUsername, linkedinUsername, leetcodeUsername, username } = req.body;
     const user = await User.findById(req.user.id);
     
     if (!user) {
@@ -127,6 +127,14 @@ router.put('/profile', require('../middleware/authMiddleware'), async (req, res)
 
     if (githubUsername !== undefined) user.githubUsername = githubUsername;
     if (linkedinUsername !== undefined) user.linkedinUsername = linkedinUsername;
+    
+    if (username !== undefined && username.trim() !== '' && username !== user.username) {
+      const existingUser = await User.findOne({ username: username.trim() });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username is already taken' });
+      }
+      user.username = username.trim();
+    }
     
     // Verify LeetCode username exists and authorized before linking
     if (leetcodeUsername !== undefined && leetcodeUsername !== '') {

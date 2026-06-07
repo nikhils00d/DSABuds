@@ -12,6 +12,7 @@ const Profile = () => {
   // Edit Profile State
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editFormData, setEditFormData] = useState({
+    username: '',
     leetcodeUsername: '',
     githubUsername: '',
     linkedinUsername: ''
@@ -42,6 +43,7 @@ const Profile = () => {
         
         // Populate edit form with existing data
         setEditFormData({
+          username: data.username || '',
           leetcodeUsername: data.leetcodeUsername || '',
           githubUsername: data.githubUsername || '',
           linkedinUsername: data.linkedinUsername || ''
@@ -334,10 +336,20 @@ const Profile = () => {
       {/* Edit Profile Modal */}
       {isEditingProfile && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card bg-[var(--bg-primary)] p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><LinkIcon className="w-6 h-6 text-brand-500" /> Manage Connections</h2>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card bg-[var(--bg-primary)] p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><Edit2 className="w-6 h-6 text-brand-500" /> Edit Profile</h2>
             
             <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Username</label>
+                <input 
+                  type="text" 
+                  value={editFormData.username}
+                  onChange={(e) => setEditFormData({...editFormData, username: e.target.value})}
+                  placeholder="Your username" 
+                  className="w-full px-4 py-3 bg-transparent border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-brand-500" 
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">LeetCode Username</label>
                 <div className="mb-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-600 dark:text-blue-400">
