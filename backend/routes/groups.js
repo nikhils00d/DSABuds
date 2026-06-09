@@ -126,4 +126,35 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
+// @route PUT /api/groups/:id/name
+// @desc Update group name
+// @access Private
+router.put('/:id/name', auth, async (req, res) => {
+  try {
+    const { groupName } = req.body;
+    if (!groupName || groupName.trim() === '') {
+      return res.status(400).json({ message: 'Group name is required' });
+    }
+
+    const group = await Group.findById(req.params.id);
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    // Ensure only members can edit the group
+    const isMember = group.members.some(memberId => memberId.toString() === req.user.id);
+    if (!isMember) {
+      return res.status(403).json({ message: 'Not authorized to edit this group' });
+    }
+
+    group.groupName = groupName.trim();
+    await group.save();
+
+    res.json({ message: 'Group name updated successfully', groupName: group.groupName });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 module.exports = router;

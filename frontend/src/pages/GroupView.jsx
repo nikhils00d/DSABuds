@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Trophy, TrendingUp, AlertCircle, Copy, ArrowLeft, Loader2 } from 'lucide-react'
+import { Trophy, TrendingUp, AlertCircle, Copy, ArrowLeft, Loader2, Edit2, Check, X } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { useState, useEffect, useContext } from 'react'
 import { AuthContext } from '../context/AuthContext'
@@ -12,6 +12,8 @@ export default function GroupView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [newName, setNewName] = useState('')
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -52,6 +54,31 @@ export default function GroupView() {
     }
   }
 
+  const handleUpdateName = async () => {
+    if (!newName.trim() || newName === group.groupName) {
+      setIsEditingName(false)
+      return
+    }
+    try {
+      const token = localStorage.getItem('dsabuds_token')
+      const res = await fetch(`/api/groups/${id}/name`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ groupName: newName })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message)
+      
+      setGroup({ ...group, groupName: data.groupName })
+      setIsEditingName(false)
+    } catch (err) {
+      alert(err.message)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-16">
@@ -82,7 +109,39 @@ export default function GroupView() {
       <div className="glass-card p-8 mb-10 border-brand-500/30">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div>
-            <h1 className="text-4xl font-extrabold mb-2">{group.groupName}</h1>
+            <div className="flex items-center gap-3 mb-2">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="text-3xl font-extrabold bg-transparent border-b-2 border-brand-500 focus:outline-none w-full max-w-[250px]"
+                    autoFocus
+                  />
+                  <button onClick={handleUpdateName} className="p-2 bg-green-500/20 text-green-500 rounded-lg hover:bg-green-500/30">
+                    <Check className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => setIsEditingName(false)} className="p-2 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500/30">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h1 className="text-4xl font-extrabold">{group.groupName}</h1>
+                  <button 
+                    onClick={() => {
+                      setNewName(group.groupName)
+                      setIsEditingName(true)
+                    }} 
+                    className="p-2 text-[var(--text-secondary)] hover:text-brand-500 hover:bg-brand-500/10 rounded-lg transition-colors"
+                    title="Edit Group Name"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
             <div className="flex items-center gap-4 text-[var(--text-secondary)]">
               <span className="flex items-center gap-1"><Trophy className="w-4 h-4" /> Fund: <span className="text-brand-500 font-bold">₹{group.groupFund || 0}</span></span>
               <span className="flex items-center gap-1">• {group.leaderboard?.length || 0} Members</span>
