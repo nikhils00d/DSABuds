@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <image href="/ChatGPT%20Image%20Jul%2027%2C%202026%2C%2002_37_49%20PM.png" width="512" height="512" preserveAspectRatio="xMidYMid meet" />
+</svg><svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="g" x1="84" y1="72" x2="432" y2="408" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="52%" stop-color="#0891b2" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#0b1220" />
+  <circle cx="158" cy="128" r="48" fill="#2563eb" />
+  <circle cx="354" cy="128" r="48" fill="#10b981" />
+  <path d="M128 286C128 202 185 144 264 144c52 0 88 22 116 62l-47 32c-20-28-43-42-72-42-51 0-82 35-82 90 0 55 31 90 82 90 34 0 59-15 80-46l49 29c-29 45-74 71-129 71-79 0-133-58-133-144Z" fill="url(#g)" />
+  <path d="M152 266h76c36 0 58 17 58 49 0 22-12 38-33 45l38 54h-61l-31-46h-14v46h-33v-148Zm33 31v43h38c15 0 23-8 23-22 0-14-8-21-23-21h-38Z" fill="#ffffff" opacity="0.96" />
+  <path d="M284 266h76c36 0 58 17 58 49 0 22-12 38-33 45l38 54h-61l-31-46h-14v46h-33v-148Zm33 31v43h38c15 0 23-8 23-22 0-14-8-21-23-21h-38Z" fill="#ffffff" opacity="0.96" transform="translate(-28 0)" />
+  <path d="M214 315h84" stroke="#0f172a" stroke-width="20" stroke-linecap="round" />
+  <path d="M238 299l-26 16 26 16" stroke="#0f172a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <path d="M274 299l26 16-26 16" stroke="#0f172a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>
