@@ -26,7 +26,7 @@ export default function Terms() {
         <Link key="support" to="/support" className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-600">
           Need help?
         </Link>,
-        <Link key="contact" to="/contact" className="rounded-xl border border-white/[0.14] bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 hover:bg-white/[0.1]">
+        <Link key="contact" to="/support" className="rounded-xl border border-white/[0.14] bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 hover:bg-white/[0.1]">
           Contact us
         </Link>,
       ]}

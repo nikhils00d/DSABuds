@@ -21,7 +21,7 @@ const Support = lazy(() => import('./pages/Support'))
 const Register = lazy(() => import('./pages/Register'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const GroupView = lazy(() => import('./pages/GroupView'))
-const Groups = lazy(() => import('./pages/Groups'))
+// const Groups = lazy(() => import('./pages/Groups'))
 const Leaderboard = lazy(() => import('./pages/Leaderboard'))
 const Challenges = lazy(() => import('./pages/Challenges'))
 const Profile = lazy(() => import('./pages/Profile'))
@@ -45,7 +45,7 @@ const TITLE_MAP = [
   ['/login', 'Login - DSABuds'],
   ['/register', 'Sign Up - DSABuds'],
   ['/dashboard', 'Dashboard - DSABuds'],
-  ['/groups', 'Groups - DSABuds'],
+  // ['/groups', 'Groups - DSABuds'],
   ['/leaderboard', 'Leaderboard - DSABuds'],
   ['/challenges', 'Challenges - DSABuds'],
   ['/analytics', 'Analytics - DSABuds'],
@@ -93,10 +93,10 @@ function AppRoutes({ user, darkMode, setDarkMode }) {
             path="/dashboard"
             element={<ProtectedRoute user={user}><RouteTransition><Dashboard /></RouteTransition></ProtectedRoute>}
           />
-          <Route
+          {/* <Route
             path="/groups"
             element={<ProtectedRoute user={user}><RouteTransition><Groups /></RouteTransition></ProtectedRoute>}
-          />
+          /> */}
           <Route
             path="/groups/:id"
             element={<ProtectedRoute user={user}><RouteTransition><GroupView /></RouteTransition></ProtectedRoute>}

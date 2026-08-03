@@ -18,7 +18,7 @@ export const publicNavLinks = [
 
 export const privateNavLinks = [
   { to: '/dashboard', label: 'Dashboard' },
-  { to: '/groups', label: 'Groups' },
+  // { to: '/groups', label: 'Groups' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/challenges', label: 'Challenges' },
   { to: '/analytics', label: 'Analytics' },
