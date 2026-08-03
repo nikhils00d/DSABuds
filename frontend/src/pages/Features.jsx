@@ -56,10 +56,10 @@ export default function Features() {
         </Link>,
         <Link
           key="secondary"
-          to="/pricing"
-          className="rounded-xl border border-white/[0.14] bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 hover:bg-white/[0.1]"
+          to="/support"
+          className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(74,222,128,0.3)] hover:bg-brand-600"
         >
-          View Pricing
+          Talk To us
         </Link>,
       ]}
     >

@@ -11,9 +11,9 @@ import {
 
 export const publicNavLinks = [
   { to: '/features', label: 'Features' },
-  { to: '/pricing', label: 'Pricing' },
+  // { to: '/pricing', label: 'Pricing' },
   { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+  // { to: '/contact', label: 'Contact' },
 ]
 
 export const privateNavLinks = [
@@ -42,9 +42,9 @@ export const profileQuickLinks = [
 
 export const footerLinks = [
   { to: '/features', label: 'Features' },
-  { to: '/pricing', label: 'Pricing' },
+  // { to: '/pricing', label: 'Pricing' },
   { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+  // { to: '/contact', label: 'Contact' },
   { to: '/privacy', label: 'Privacy Policy' },
   { to: '/terms', label: 'Terms' },
   { to: '/support', label: 'Support' },

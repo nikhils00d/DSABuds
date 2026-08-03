@@ -10,10 +10,10 @@ import SiteFooter from './components/common/SiteFooter'
 
 const Landing = lazy(() => import('./pages/Landing'))
 const Features = lazy(() => import('./pages/Features'))
-const Pricing = lazy(() => import('./pages/Pricing'))
+// const Pricing = lazy(() => import('./pages/Pricing'))
 const About = lazy(() => import('./pages/About'))
 const Brand = lazy(() => import('./pages/Brand'))
-const Contact = lazy(() => import('./pages/Contact'))
+// const Contact = lazy(() => import('./pages/Contact'))
 const Login = lazy(() => import('./pages/Login'))
 const Privacy = lazy(() => import('./pages/Privacy'))
 const Terms = lazy(() => import('./pages/Terms'))
@@ -35,10 +35,10 @@ const Billing = lazy(() => import('./pages/Billing'))
 const TITLE_MAP = [
   ['/', 'DSABuds - DSA Accountability SaaS'],
   ['/features', 'Features - DSABuds'],
-  ['/pricing', 'Pricing - DSABuds'],
+  // ['/pricing', 'Pricing - DSABuds'],
   ['/about', 'About - DSABuds'],
   ['/brand', 'Brand Guidelines - DSABuds'],
-  ['/contact', 'Contact - DSABuds'],
+  // ['/contact', 'Contact - DSABuds'],
   ['/privacy', 'Privacy Policy - DSABuds'],
   ['/terms', 'Terms of Service - DSABuds'],
   ['/support', 'Support - DSABuds'],
@@ -79,10 +79,10 @@ function AppRoutes({ user, darkMode, setDarkMode }) {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<RouteTransition><Landing /></RouteTransition>} />
           <Route path="/features" element={<RouteTransition><Features /></RouteTransition>} />
-          <Route path="/pricing" element={<RouteTransition><Pricing /></RouteTransition>} />
+          {/* <Route path="/pricing" element={<RouteTransition><Pricing /></RouteTransition>} /> */}
           <Route path="/about" element={<RouteTransition><About /></RouteTransition>} />
           <Route path="/brand" element={<RouteTransition><Brand /></RouteTransition>} />
-          <Route path="/contact" element={<RouteTransition><Contact /></RouteTransition>} />
+          {/* <Route path="/contact" element={<RouteTransition><Contact /></RouteTransition>} /> */}
           <Route path="/privacy" element={<RouteTransition><Privacy /></RouteTransition>} />
           <Route path="/terms" element={<RouteTransition><Terms /></RouteTransition>} />
           <Route path="/support" element={<RouteTransition><Support /></RouteTransition>} />

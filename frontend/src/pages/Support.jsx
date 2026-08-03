@@ -31,9 +31,9 @@ export default function Support() {
       title="Get help with onboarding, billing, or product questions."
       description="Use the support channels below if you need account help, a team demo, or a quick answer about the platform."
       actions={[
-        <Link key="contact" to="/contact" className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-600">
+        <a key="contact" href="mailto:support@dsabuds.com" className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-600">
           Send a message
-        </Link>,
+        </a>,
         <Link key="features" to="/features" className="rounded-xl border border-white/[0.14] bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 hover:bg-white/[0.1]">
           Explore features
         </Link>,
@@ -101,12 +101,11 @@ export default function Support() {
         <article className="rounded-3xl border border-white/[0.1] bg-gradient-to-r from-brand-500/10 to-transparent p-7">
           <h2 className="text-2xl font-bold text-white">Need a faster path?</h2>
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
-            Use the contact page for detailed requests, or open GitHub and LinkedIn if you are looking for product updates and community touchpoints.
-          </p>
+            Email us directly for detailed requests, or open GitHub and LinkedIn...          </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link to="/contact" className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-600">
-              Contact form
-            </Link>
+            <a href="mailto:support@dsabuds.com" className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-600">
+              Email Support
+            </a>
             <Link to="/privacy" className="rounded-xl border border-white/[0.14] bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 hover:bg-white/[0.1]">
               Privacy policy
             </Link>
