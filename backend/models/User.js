@@ -44,9 +44,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  joinedGroups: [{
+  currentGroup: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Group'
+    ref: 'Group',
+    default: null
   }]
 }, { timestamps: true });
 

@@ -54,7 +54,7 @@ export default function MobileNav({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 340, damping: 32 }}
-              className="fixed right-0 top-[72px] z-50 flex h-[calc(100vh-72px)] w-[88vw] max-w-sm flex-col border-l border-white/[0.12] bg-[#08101e]/96 p-5 backdrop-blur-2xl"
+              className="fixed right-0 top-[72px] z-50 flex h-[calc(100vh-72px)] w-[88vw] max-w-sm flex-col border-l border-slate-200 dark:border-white/[0.12] bg-white/96 dark:bg-[#08101e]/96 p-5 backdrop-blur-2xl"
               aria-label="Mobile navigation"
             >
               <nav className="mb-5 flex-1 overflow-y-auto pr-1" aria-label={user ? 'Application navigation' : 'Main navigation'}>
@@ -102,7 +102,7 @@ export default function MobileNav({
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="block rounded-xl border border-white/[0.12] px-4 py-3 text-center font-semibold text-slate-200"
+                    className="block rounded-xl border border-slate-200 dark:border-white/[0.12] px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.04]"
                   >
                     Login
                   </Link>

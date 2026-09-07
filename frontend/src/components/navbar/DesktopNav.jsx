@@ -33,7 +33,7 @@ export default function DesktopNav({ darkMode, setDarkMode, user, onLogout }) {
           <>
             <Link
               to="/login"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
             >
               Login
             </Link>

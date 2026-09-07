@@ -624,7 +624,7 @@ function Modal({ title, onClose, onSubmit, loading, error, children }) {
    MAIN DASHBOARD
 ══════════════════════════════════════════════════════════ */
 export default function Dashboard() {
-  const { user } = useContext(AuthContext)
+  const { user, logout } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const [userData, setUserData] = useState(null)
@@ -656,6 +656,8 @@ export default function Dashboard() {
             }
           } catch (syncError) { console.error('Failed to sync LeetCode data:', syncError) }
         }
+      } else if (res.status === 401) {
+        logout();
       }
     } catch (error) { console.error('Failed to fetch dashboard data:', error) }
     finally { setLoading(false) }

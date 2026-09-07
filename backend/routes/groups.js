@@ -20,6 +20,11 @@ router.post('/create', auth, async (req, res) => {
     if (!groupName) {
       return res.status(400).json({ message: 'Group name is required' });
     }
+    const requestingUser = await User.findById(req.user.id);
+    if (requestingUser.currentGroup) {
+      return res.status(400).json({ message: 'You must leave your current group before creating a new one' });
+    }
+
 
     // Generate unique invite code
     let groupCode;
@@ -41,7 +46,7 @@ router.post('/create', auth, async (req, res) => {
 
     // Add group to user's joinedGroups
     await User.findByIdAndUpdate(req.user.id, {
-      $push: { joinedGroups: savedGroup._id }
+      currentGroup: savedGroup._id
     });
 
     res.status(201).json(savedGroup);
@@ -94,7 +99,7 @@ router.post('/join', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
   try {
     const group = await Group.findById(req.params.id).populate('members', 'username leetcodeUsername streak missedDays totalFine');
-    
+
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }

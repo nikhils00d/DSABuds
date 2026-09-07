@@ -125,7 +125,7 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1120] overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-primary)] overflow-hidden">
 
       {/* ── Hero Section ─────────────────────────────────── */}
       <section
@@ -191,11 +191,11 @@ export default function Landing() {
               {/* Headline */}
               <motion.div variants={fadeUp} custom={0.08}>
                 <h1 className="text-5xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.07]">
-                  <span className="text-white">Stay Consistent.</span>
+                  <span className="text-slate-900 dark:text-white">Stay Consistent.</span>
                   <br />
                   <span className="text-shimmer">Crack Every</span>
                   <br />
-                  <span className="text-white">Interview.</span>
+                  <span className="text-slate-900 dark:text-white">Interview.</span>
                 </h1>
               </motion.div>
 
@@ -673,7 +673,7 @@ function FeaturesSection() {
           {/* Heading */}
           <h2
             id="features-heading"
-            className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1] max-w-2xl"
+            className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-2xl"
           >
             Everything You Need
             <br />

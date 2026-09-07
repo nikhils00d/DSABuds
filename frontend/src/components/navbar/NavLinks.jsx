@@ -17,9 +17,9 @@ export default function NavLinks({ links, onNavigate, vertical = false }) {
               aria-current={isActive ? 'page' : undefined}
               className={`relative inline-flex items-center ${vertical ? 'w-full px-4 py-3 rounded-xl' : 'py-2'} text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 ${
                 isActive
-                  ? 'text-brand-400'
-                  : 'text-slate-300 hover:text-white'
-              } ${vertical && !isActive ? 'hover:bg-white/[0.06]' : ''}`}
+                  ? 'text-brand-500 dark:text-brand-400'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              } ${vertical && !isActive ? 'hover:bg-slate-100 dark:hover:bg-white/[0.06]' : ''}`}
             >
               {link.label}
               {isActive && (

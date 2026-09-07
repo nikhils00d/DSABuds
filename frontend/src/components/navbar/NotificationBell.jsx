@@ -13,8 +13,8 @@ export default function NotificationBell() {
         whileTap={{ scale: 0.95 }}
         className={`relative flex h-10 w-10 items-center justify-center rounded-xl border transition-all ${
           active
-            ? 'border-brand-400/60 bg-brand-500/10 text-brand-400 shadow-[0_0_18px_rgba(74,222,128,0.25)]'
-            : 'border-white/[0.12] bg-white/[0.04] text-slate-300 hover:bg-white/[0.1] hover:text-white'
+            ? 'border-brand-500/60 dark:border-brand-400/60 bg-brand-500/10 text-brand-600 dark:text-brand-400 shadow-[0_0_18px_rgba(74,222,128,0.25)]'
+            : 'border-slate-200 dark:border-white/[0.12] bg-slate-100/50 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-white/[0.1] hover:text-slate-900 dark:hover:text-white'
         }`}
       >
         <Bell className="h-4.5 w-4.5" />
